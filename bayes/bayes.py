@@ -38,7 +38,7 @@ def get_condition_percentile(word, sentences, classes):
             else:
                 n_perc += 1 
         i+=1
-    return float(p_perc)/(len(classes)), float(n_perc)/(len(classes))
+    return float(p_perc+1)/(len(classes)+2), float(n_perc+1)/(len(classes)+2)
 
 def classify_sentence(sentence, words, words_positive_perc, words_nagetive_perc):
     vec = get_train_data(words, sentence)
