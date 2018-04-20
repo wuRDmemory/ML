@@ -1,10 +1,10 @@
-import os, macpath
+import os, math
 import numpy as np
 import matplotlib.pyplot as plt
 
 def load_data():
     postingList=[['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],
-                 ['maybe', 'not', 'take', 'him', 'to', 'dog', 'park', 'stupid'],
+                 ['maybe', 'not', 'hate', 'him', 'to', 'dog', 'park', 'stupid'],
                  ['my', 'dalmation', 'is', 'so', 'cute', 'I', 'love', 'him'],
                  ['stop', 'posting', 'stupid', 'worthless', 'garbage'],
                  ['mr', 'licks', 'ate', 'my', 'steak', 'how', 'to', 'stop', 'him'],
@@ -38,7 +38,7 @@ def get_condition_percentile(word, sentences, classes):
             else:
                 n_perc += 1 
         i+=1
-    return float(p_perc+1)/(len(classes)+2), float(n_perc+1)/(len(classes)+2)
+    return math.log(float(p_perc+1)/(len(classes)+2)), math.log(float(n_perc+1)/(len(classes)+2))
 
 def classify_sentence(sentence, words, words_positive_perc, words_nagetive_perc):
     vec = get_train_data(words, sentence)
@@ -47,8 +47,10 @@ def classify_sentence(sentence, words, words_positive_perc, words_nagetive_perc)
     np_words_nagetive_perc = np.array(words_nagetive_perc)
     np_p_perc = np_words_positive_perc[np_vec==1]
     np_n_perc = np_words_nagetive_perc[np_vec==1]
-    p_perc = reduce(lambda x,y: x*y, np_p_perc)*0.5
-    n_perc = reduce(lambda x,y: x*y, np_n_perc)*0.5
+    print ">>> p: ", np_p_perc
+    print ">>> n: ", np_n_perc
+    p_perc = reduce(lambda x,y: x+y, np_p_perc)+math.log(0.5)
+    n_perc = reduce(lambda x,y: x+y, np_n_perc)+math.log(0.5)
     return p_perc, n_perc
     
 
@@ -65,9 +67,9 @@ if __name__=='__main__':
         print "word:%s\tp_perc:%.2f\tn_perc:%.2f" % (word, p_perc, n_perc)
 
     # classify
-    sen1 = ['stupid', 'dog', 'my']
-    sen2 = ['help', 'problem']
+    sen1 = ['hate', 'him', 'I']
+    sen2 = ['love', 'I', 'him']
     p,n = classify_sentence(sen1, words, word_positive_perc, word_nagetive_perc)
-    print p, n
+    print ">>> bad sentence : ", p < n, " perc : p ",p, " n ",n
     p,n = classify_sentence(sen2, words, word_positive_perc, word_nagetive_perc)
-    print p, n
+    print ">>> bad sentence : ", p < n, " perc : p ",p, " n ",n
